@@ -1,0 +1,1 @@
+##instruções sobre como lidar com o projeto

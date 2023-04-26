@@ -1,0 +1,16 @@
+## As bibliotecas utilizadas são:
+
+1. pandas 
+2. numpy 
+3. matplotlib pyplot 
+4. seaborn
+5. sklearn.linear_model LinearRegression
+6. sklearn.tree DecisionTreeRegressor
+7. sklearn.ensemble RandomForestRegressor
+8. sklearn.model_selection train_test_split
+9. sklearn.model_selection cross_val_score
+10. sklearn.model_selection GridSearchCV
+11. sklearn.metrics mean_absolute_error, r2_score, mean_squared_error
+12. sklearn.preprocessing RobustScaler
+13. gc
+14. pickle
