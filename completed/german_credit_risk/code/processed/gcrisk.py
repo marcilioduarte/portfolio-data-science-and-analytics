@@ -11,7 +11,7 @@ import gradio as gr
 ## CREATING FUNCTION
 
 def predict_credit_worthiness(name, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22):
-    path =  r'C:\Users\Marcilio Duarte\OneDrive\Documents\Projetos\13 - Portfolio_Github\github\completed\german_credit_risk\model\model.pickle'
+    path =  'german_credit_risk/model/model.pickle'
     greet = 'Hey, ' + name + '!'
     with open(path, 'rb') as file:
         model = pickle.load(file)
@@ -40,10 +40,10 @@ def predict_credit_worthiness(name, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11
                   }
         prediction = model.predict([list(inputs.values())])
         
-    y_test = pd.read_parquet(r'C:\Users\Marcilio Duarte\OneDrive\Documents\Projetos\13 - Portfolio_Github\github\completed\german_credit_risk\data\processed\y_test.parquet')
+    y_test = pd.read_parquet('german_credit_risk/data/processed/y_test.parquet')
     y_test = y_test.squeeze()
 
-    yhat = pd.read_parquet(r'C:\Users\Marcilio Duarte\OneDrive\Documents\Projetos\13 - Portfolio_Github\github\completed\german_credit_risk\data\processed\yhat.parquet')
+    yhat = pd.read_parquet('german_credit_risk/data/processed/yhat.parquet')
     yhat = yhat.squeeze()
     
     precision = precision_score(y_test, yhat).round(2)
@@ -97,66 +97,66 @@ with gr.Blocks() as demo:
                 2. Once completed, click 'Predict' to determine if the client is creditworthy.
                 """)
     with gr.Accordion('Name'):
-        name = gr.inputs.Textbox(lines=1, label='Your name')
+        name = gr.Textbox(lines=1, label='Your name')
     with gr.Accordion("Enter your client's information"):
         with gr.Tab('Account Balance'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x1 = gr.inputs.Checkbox(1, label='No account')
-            x2 = gr.inputs.Checkbox(0, label='No balance')
-            x3 = gr.inputs.Checkbox(0, label='Some balance')
+            x1 = gr.Checkbox(1, label='No account')
+            x2 = gr.Checkbox(0, label='No balance')
+            x3 = gr.Checkbox(0, label='Some balance')
         with gr.Tab('Payment status of previous credit'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x4 = gr.inputs.Checkbox(1, label='Some problems')
-            x5 = gr.inputs.Checkbox(0, label='No problems in this bank')
+            x4 = gr.Checkbox(1, label='Some problems')
+            x5 = gr.Checkbox(0, label='No problems in this bank')
         with gr.Tab('Purpose'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x6 = gr.inputs.Checkbox(1, label='New car')
-            x7 = gr.inputs.Checkbox(0, label='Other')
+            x6 = gr.Checkbox(1, label='New car')
+            x7 = gr.Checkbox(0, label='Other')
         with gr.Tab('Value savings/stocks'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x8 = gr.inputs.Checkbox(1, label='No savings')
-            x9 = gr.inputs.Checkbox(0, label='DM betwenn [100, 1000]')
-            x10 = gr.inputs.Checkbox(0, label='DM >= 1000')
+            x8 = gr.Checkbox(1, label='No savings')
+            x9 = gr.Checkbox(0, label='DM betwenn [100, 1000]')
+            x10 = gr.Checkbox(0, label='DM >= 1000')
         with gr.Tab('Length of current employment'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x11 = gr.inputs.Checkbox(1, label='Below 1 year (or unemployed)')
-            x12 = gr.inputs.Checkbox(0, label='Between 4 and 7 years')
+            x11 = gr.Checkbox(1, label='Below 1 year (or unemployed)')
+            x12 = gr.Checkbox(0, label='Between 4 and 7 years')
         with gr.Tab('Instalment per cent'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x13 = gr.inputs.Checkbox(0, label='Smaller than 20%')
+            x13 = gr.Checkbox(0, label='Smaller than 20%')
         with gr.Tab('Guarantors'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x14 = gr.inputs.Checkbox(0, label='No guarantors')
+            x14 = gr.Checkbox(0, label='No guarantors')
         with gr.Tab('Duration in current address'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x15 = gr.inputs.Checkbox(1, label='Less than a year')
-            x16 = gr.inputs.Checkbox(0, label='Between 1 and 4 years')
+            x15 = gr.Checkbox(1, label='Less than a year')
+            x16 = gr.Checkbox(0, label='Between 1 and 4 years')
         with gr.Tab('Most valuable available asset'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x17 = gr.inputs.Checkbox(1, label='Not available / no assets')
-            x18 = gr.inputs.Checkbox(0, label='Ownership of house or land')
+            x17 = gr.Checkbox(1, label='Not available / no assets')
+            x18 = gr.Checkbox(0, label='Ownership of house or land')
         with gr.Tab('Concurrent credits'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x19 = gr.inputs.Checkbox(0, label='No further running credits')
+            x19 = gr.Checkbox(0, label='No further running credits')
         with gr.Tab('Type of apartment'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x20 = gr.inputs.Checkbox(0, label='Free apartment')
+            x20 = gr.Checkbox(0, label='Free apartment')
         with gr.Tab('Number of credits at this Bank'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x21 = gr.inputs.Checkbox(0, label='One credit')        
+            x21 = gr.Checkbox(0, label='One credit')        
         with gr.Tab('Occupation'):
             gr.Markdown('Select only one option. Leave all boxes blank if none of the options fits the client.')
-            x22 = gr.inputs.Checkbox(0, label='Unemployed or unskilled with no permanent') 
+            x22 = gr.Checkbox(0, label='Unemployed or unskilled with no permanent') 
     predict_button = gr.Button('Predict')
-    prediction_output = gr.outputs.Label(num_top_classes=2)
+    prediction_output = gr.Label(num_top_classes=2)
     with gr.Accordion('Metrics and plots'):
         with gr.Tab('Metrics'):
             with gr.Row():
-                precision_output = gr.outputs.Label()
+                precision_output = gr.Label()
             with gr.Row():
-                recall_output = gr.outputs.Label()
+                recall_output = gr.Label()
             with gr.Row():
-                f1_output = gr.outputs.Label()
+                f1_output = gr.Label()
         with gr.Tab('Feature Importances'):
             fimp_output = gr.Plot()
         with gr.Tab('Confusion Matrix'):
@@ -170,4 +170,4 @@ with gr.Blocks() as demo:
                 [Github](https://github.com/marcilioduarte)
                 @marcilioduarte | Economics and Data Science
                 ''')
-demo.launch(share=True)
+demo.launch()
