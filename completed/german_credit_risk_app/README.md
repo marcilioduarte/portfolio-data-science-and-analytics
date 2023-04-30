@@ -7,9 +7,15 @@ I used a previous work from Pennsylvania State University as a reference in many
 It is worth mentioning that the feature selection process was carefully performed according to the regulations of the Central Bank of Brazil, as I'm Brazilian.
 
 ---
+
 title: Credit Worthiness Risk Classification
+
 sdk: gradio
+
 sdk_version: 3.27.0
+
 app_file: app.py
+
 license: apache-2.0
+
 ---
