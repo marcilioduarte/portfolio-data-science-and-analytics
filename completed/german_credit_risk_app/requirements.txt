@@ -1,4 +1,4 @@
-pandas
-plotly.express
-scikit-learn
-gradio
+pandas==1.5.3
+plotly==5.14.1
+scikit-learn==1.1.2
+gradio==3.24.1
