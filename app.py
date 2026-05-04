@@ -2,16 +2,19 @@
 
 import pandas as pd
 import plotly.express as px
+from pathlib import Path
 
 from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix
 
 import pickle
 import gradio as gr
 
+BASE_DIR = Path(__file__).resolve().parent
+
 ## CREATING FUNCTION
 
 def predict_credit_worthiness(name, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22):
-    path =  'german_credit_risk/model/model.pickle'
+    path = BASE_DIR / "model" / "model.pickle"
     greet = 'Hey, ' + name + '!'
     with open(path, 'rb') as file:
         model = pickle.load(file)
@@ -40,10 +43,10 @@ def predict_credit_worthiness(name, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11
                   }
         prediction = model.predict([list(inputs.values())])
         
-    y_test = pd.read_parquet('german_credit_risk/data/processed/y_test.parquet')
+    y_test = pd.read_parquet(BASE_DIR / "data" / "processed" / "y_test.parquet")
     y_test = y_test.squeeze()
 
-    yhat = pd.read_parquet('german_credit_risk/data/processed/yhat.parquet')
+    yhat = pd.read_parquet(BASE_DIR / "data" / "processed" / "yhat.parquet")
     yhat = yhat.squeeze()
     
     precision = precision_score(y_test, yhat).round(2)
