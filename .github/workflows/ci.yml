@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -r projects/credit-risk-classification/requirements.txt
+          pip install -r projects/house-prices-regression/requirements.txt
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Run unit tests
+        env:
+          PYTHONPATH: projects/credit-risk-classification/src:projects/house-prices-regression/src
+        run: |
+          python -m unittest discover -s projects/credit-risk-classification/tests -p "test_*.py"
+          python -m unittest discover -s projects/house-prices-regression/tests -p "test_*.py"
+
