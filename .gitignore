@@ -1,0 +1,4 @@
+
+# Large model artifacts
+projects/*/model/*.joblib
+projects/*/model/*.pickle
