@@ -1,3 +1,15 @@
+---
+title: Credit Worthiness Risk Classification
+emoji: "📈"
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: "3.24.1"
+python_version: "3.10"
+app_file: app.py
+pinned: false
+---
+
 # Credit Worthiness Risk Classification
 
 End-to-end classification case study for credit risk prediction, including preprocessing, model selection, and app delivery.
