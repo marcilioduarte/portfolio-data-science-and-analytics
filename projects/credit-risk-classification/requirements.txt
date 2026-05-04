@@ -2,5 +2,6 @@ numpy==1.26.4
 pandas==1.5.3
 plotly==5.14.1
 scikit-learn==1.1.2
-gradio==3.24.1
+gradio==6.14.0
 pyarrow==14.0.2
+joblib==1.5.2

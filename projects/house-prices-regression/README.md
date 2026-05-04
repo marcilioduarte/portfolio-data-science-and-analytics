@@ -13,6 +13,7 @@ data/
   raw/calif_housing_prices_.csv
   clean/calif_housing_prices_clean.parquet
 src/house_prices/
+  app_support.py
   config.py
   features.py
   modeling.py
@@ -46,6 +47,7 @@ python scripts/evaluate_model.py
 ## Output Artifacts
 
 - `model/model.joblib`
+- `model/feature_order.json`
 - `reports/metrics.json`
 - `data/processed/x_train.parquet`
 - `data/processed/x_test.parquet`
@@ -57,3 +59,4 @@ python scripts/evaluate_model.py
 
 - The notebook is kept as exploratory documentation.
 - The reproducible pipeline lives in `src/` + `scripts/`.
+- `src/house_prices/app_support.py` is ready for the upcoming Gradio app layer.

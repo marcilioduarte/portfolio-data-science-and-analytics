@@ -15,3 +15,12 @@ def build_training_frame(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     features = df.drop(columns=[TARGET_COLUMN]).copy()
     target = df[TARGET_COLUMN].copy()
     return features, target
+
+
+def build_inference_frame(payload: dict[str, object], feature_order: list[str]) -> pd.DataFrame:
+    """Build one-row inference DataFrame preserving trained feature order."""
+    missing = [col for col in feature_order if col not in payload]
+    if missing:
+        raise ValueError(f"Missing required input fields: {missing}")
+    row = {col: payload[col] for col in feature_order}
+    return pd.DataFrame([row], columns=feature_order)

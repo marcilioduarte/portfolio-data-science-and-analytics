@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -51,6 +52,10 @@ def main() -> None:
 
     save_model(model=model, path=MODEL_DIR / "model.joblib")
     save_metrics(metrics=metrics, path=REPORTS_DIR / "metrics.json")
+    (MODEL_DIR / "feature_order.json").write_text(
+        json.dumps(list(x_train.columns), indent=2),
+        encoding="utf-8",
+    )
 
     print("Training finished successfully.")
     print(f"Saved model to: {MODEL_DIR / 'model.joblib'}")
