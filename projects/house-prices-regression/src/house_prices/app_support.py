@@ -134,11 +134,22 @@ def build_location_map(latitude: float, longitude: float, predicted_value: float
     fig.update_layout(
         title=f"Prediction Location (Estimated Value: ${predicted_value:,.2f})",
         mapbox={
-            "style": "open-street-map",
+            "style": "white-bg",
+            "layers": [
+                {
+                    "below": "traces",
+                    "sourcetype": "raster",
+                    "sourceattribution": "Esri, Maxar, Earthstar Geographics",
+                    "source": [
+                        "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    ],
+                }
+            ],
             # Fixed center/zoom to keep a California-focused viewport.
             "center": {"lat": 36.7783, "lon": -119.4179},
             "zoom": 4.8,
         },
+        height=620,
         margin={"l": 0, "r": 0, "t": 48, "b": 0},
     )
     return fig
