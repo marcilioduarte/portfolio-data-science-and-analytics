@@ -10,6 +10,7 @@ import joblib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from geopy.geocoders import Nominatim
 from sklearn.model_selection import train_test_split
 
 from house_prices.config import (
@@ -21,6 +22,8 @@ from house_prices.config import (
 )
 from house_prices.features import build_inference_frame, build_training_frame
 from house_prices.modeling import evaluate_model, save_metrics, save_model, train_model
+
+_REFERENCE_DF: pd.DataFrame | None = None
 
 
 def load_model() -> Any:
@@ -135,4 +138,79 @@ def build_location_map(latitude: float, longitude: float, predicted_value: float
         title=f"Prediction Location (Estimated Value: ${predicted_value:,.2f})",
     )
     fig.update_layout(geo={"scope": "usa"})
+    fig.update_layout(
+        geo={
+            "scope": "usa",
+            "lonaxis": {"range": [-125.0, -113.0]},
+            "lataxis": {"range": [32.0, 43.0]},
+        }
+    )
     return fig
+
+
+def _load_reference_dataframe() -> pd.DataFrame:
+    """Load dataset used to recover nearest district features from coordinates."""
+    global _REFERENCE_DF
+    if _REFERENCE_DF is not None:
+        return _REFERENCE_DF
+
+    source = DATA_RAW_PATH
+    frame = pd.read_csv(source)
+    required = [
+        "longitude",
+        "latitude",
+        "housing_median_age",
+        "total_rooms",
+        "total_bedrooms",
+        "population",
+        "households",
+        "median_income",
+        "ocean_proximity",
+    ]
+    _REFERENCE_DF = frame[required].dropna().reset_index(drop=True)
+    return _REFERENCE_DF
+
+
+def geocode_california_address(address: str) -> tuple[float, float, str]:
+    """Geocode address constrained to California, USA."""
+    query = f"{address}, California, USA"
+    geocoder = Nominatim(user_agent="house-prices-regression-app")
+    location = geocoder.geocode(query, country_codes="us", addressdetails=False, exactly_one=True)
+    if location is None:
+        raise ValueError("Address not found. Try a more specific California address.")
+    return float(location.latitude), float(location.longitude), str(location.address)
+
+
+def nearest_district_profile(latitude: float, longitude: float) -> dict[str, object]:
+    """Return nearest dataset district profile for a given coordinate pair."""
+    frame = _load_reference_dataframe()
+    dlon = frame["longitude"] - float(longitude)
+    dlat = frame["latitude"] - float(latitude)
+    idx = ((dlon * dlon) + (dlat * dlat)).idxmin()
+    row = frame.loc[int(idx)]
+    return {
+        "longitude": float(row["longitude"]),
+        "latitude": float(row["latitude"]),
+        "housing_median_age": float(row["housing_median_age"]),
+        "total_rooms": float(row["total_rooms"]),
+        "total_bedrooms": float(row["total_bedrooms"]),
+        "population": float(row["population"]),
+        "households": float(row["households"]),
+        "median_income": float(row["median_income"]),
+        "ocean_proximity": str(row["ocean_proximity"]),
+    }
+
+
+def autofill_profile_from_address(address: str) -> tuple[dict[str, object], str]:
+    """
+    Build an input profile from address by:
+    1) geocoding the address in California,
+    2) finding nearest district record in the reference dataset.
+    """
+    latitude, longitude, resolved_address = geocode_california_address(address)
+    profile = nearest_district_profile(latitude=latitude, longitude=longitude)
+    status = (
+        f"Address resolved to: {resolved_address}. "
+        "District features were populated from the nearest available dataset district."
+    )
+    return profile, status
