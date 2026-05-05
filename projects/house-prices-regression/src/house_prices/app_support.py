@@ -120,30 +120,26 @@ def format_metrics_markdown(metrics: dict[str, float]) -> str:
 
 
 def build_location_map(latitude: float, longitude: float, predicted_value: float) -> go.Figure:
-    """Create a simple geographic visualization of the prediction point."""
-    frame = pd.DataFrame(
-        [
-            {
-                "latitude": latitude,
-                "longitude": longitude,
-                "predicted_value": predicted_value,
-            }
-        ]
+    """Create a California-focused map with the prediction point marker."""
+    fig = go.Figure(
+        go.Scattermapbox(
+            lat=[latitude],
+            lon=[longitude],
+            mode="markers",
+            marker={"size": 12},
+            text=[f"Estimated Value: ${predicted_value:,.2f}"],
+            hoverinfo="text",
+        )
     )
-    fig = px.scatter_geo(
-        frame,
-        lat="latitude",
-        lon="longitude",
-        hover_data={"predicted_value": ":.2f"},
-        title=f"Prediction Location (Estimated Value: ${predicted_value:,.2f})",
-    )
-    fig.update_layout(geo={"scope": "usa"})
     fig.update_layout(
-        geo={
-            "scope": "usa",
-            "lonaxis": {"range": [-125.0, -113.0]},
-            "lataxis": {"range": [32.0, 43.0]},
-        }
+        title=f"Prediction Location (Estimated Value: ${predicted_value:,.2f})",
+        mapbox={
+            "style": "open-street-map",
+            # Fixed center/zoom to keep a California-focused viewport.
+            "center": {"lat": 36.7783, "lon": -119.4179},
+            "zoom": 4.8,
+        },
+        margin={"l": 0, "r": 0, "t": 48, "b": 0},
     )
     return fig
 
