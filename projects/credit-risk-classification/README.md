@@ -4,7 +4,7 @@ emoji: "📈"
 colorFrom: blue
 colorTo: indigo
 sdk: gradio
-sdk_version: "3.24.1"
+sdk_version: "6.14.0"
 python_version: "3.10"
 app_file: app.py
 pinned: false
@@ -41,6 +41,6 @@ python app.py
 ## Project Metadata
 
 - `sdk`: gradio
-- `sdk_version`: 3.27.0
+- `sdk_version`: 6.14.0
 - `app_file`: `app.py`
 - `license`: Apache-2.0
