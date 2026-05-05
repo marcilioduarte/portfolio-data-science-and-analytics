@@ -1,3 +1,15 @@
+---
+title: California House Prices Regression
+emoji: "🏠"
+colorFrom: green
+colorTo: blue
+sdk: gradio
+sdk_version: "6.14.0"
+python_version: "3.10"
+app_file: app.py
+pinned: false
+---
+
 # California House Prices Regression
 
 Production-style regression project adapted from the original notebook workflow.
@@ -20,6 +32,7 @@ src/house_prices/
 scripts/
   train_model.py
   evaluate_model.py
+app.py
 notebooks/
   house_prices_modeling.ipynb
 ```
@@ -42,6 +55,12 @@ python scripts/train_model.py
 
 ```bash
 python scripts/evaluate_model.py
+```
+
+4. Run app:
+
+```bash
+python app.py
 ```
 
 ## Output Artifacts
