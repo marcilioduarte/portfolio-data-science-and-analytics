@@ -163,9 +163,16 @@ def format_metrics_markdown(metrics: dict[str, float]) -> str:
         return "Metrics not available. Run `python scripts/train_model.py` first."
 
     lines = ["### Model Metrics"]
-    for key, value in metrics.items():
-        metric_name = key.replace("_", " ").title()
-        lines.append(f"- **{metric_name}:** {value:.4f}")
+    if "accuracy" in metrics:
+        lines.append(f"- **Accuracy (TP + TN) / (TP + TN + FP + FN):** {metrics['accuracy']:.4f}")
+    if "precision" in metrics:
+        lines.append(f"- **Precision TP / (TP + FP):** {metrics['precision']:.4f}")
+    if "recall" in metrics:
+        lines.append(f"- **Recall TP / (TP + FN):** {metrics['recall']:.4f}")
+    if "f1_score" in metrics:
+        lines.append(f"- **F1 Score 2 * (Precision * Recall) / (Precision + Recall):** {metrics['f1_score']:.4f}")
+    if "roc_auc" in metrics:
+        lines.append(f"- **ROC AUC (Area Under ROC Curve):** {metrics['roc_auc']:.4f}")
     return "\n".join(lines)
 
 
