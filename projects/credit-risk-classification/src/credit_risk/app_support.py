@@ -12,7 +12,7 @@ import joblib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import auc, confusion_matrix, roc_curve
 from sklearn.model_selection import train_test_split
 
 from credit_risk.config import (
@@ -34,6 +34,7 @@ class AppArtifacts:
     metrics: dict[str, float]
     feature_importance_plot: go.Figure
     confusion_matrix_plot: go.Figure
+    roc_curve_plot: go.Figure
 
 
 def _load_model() -> Any:
@@ -108,6 +109,14 @@ def _load_test_outputs() -> tuple[pd.Series | None, pd.Series | None]:
     return y_test, y_hat
 
 
+def _load_x_test() -> pd.DataFrame | None:
+    """Load x_test features used to compute ROC curve from model probabilities."""
+    x_test_path = Path("data") / "processed" / "x_test.parquet"
+    if not x_test_path.exists():
+        return None
+    return pd.read_parquet(x_test_path)
+
+
 def _build_feature_importance_plot(model: Any) -> go.Figure:
     """Build a robust plot even when the estimator has no feature_importances_."""
     if hasattr(model, "feature_importances_"):
@@ -157,6 +166,47 @@ def _build_confusion_matrix_plot(y_test: pd.Series | None, y_hat: pd.Series | No
     )
 
 
+def _build_roc_curve_plot(model: Any, y_test: pd.Series | None, x_test: pd.DataFrame | None) -> go.Figure:
+    """Build ROC curve when model probabilities and test data are available."""
+    if y_test is None or x_test is None or not hasattr(model, "predict_proba"):
+        return go.Figure(
+            layout={
+                "title": "ROC curve not available yet. Run training script first.",
+                "xaxis_title": "False Positive Rate",
+                "yaxis_title": "True Positive Rate",
+            }
+        )
+
+    y_score = model.predict_proba(x_test)[:, 1]
+    fpr, tpr, _ = roc_curve(y_test, y_score)
+    roc_auc = auc(fpr, tpr)
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=fpr,
+            y=tpr,
+            mode="lines",
+            name=f"ROC Curve (AUC = {roc_auc:.4f})",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[0, 1],
+            y=[0, 1],
+            mode="lines",
+            name="Baseline (AUC = 0.5)",
+            line={"dash": "dash"},
+        )
+    )
+    fig.update_layout(
+        title=f"ROC Curve (AUC = {roc_auc:.4f})",
+        xaxis_title="False Positive Rate",
+        yaxis_title="True Positive Rate",
+    )
+    return fig
+
+
 def format_metrics_markdown(metrics: dict[str, float]) -> str:
     """Render metrics consistently in the UI."""
     if not metrics:
@@ -201,11 +251,13 @@ def load_artifacts() -> AppArtifacts:
     model = _load_model()
     metrics = _load_metrics()
     y_test, y_hat = _load_test_outputs()
+    x_test = _load_x_test()
 
     return AppArtifacts(
         model=model,
         metrics=metrics,
         feature_importance_plot=_build_feature_importance_plot(model),
         confusion_matrix_plot=_build_confusion_matrix_plot(y_test, y_hat),
+        roc_curve_plot=_build_roc_curve_plot(model, y_test, x_test),
     )
 

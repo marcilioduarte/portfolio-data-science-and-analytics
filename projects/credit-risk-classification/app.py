@@ -17,7 +17,7 @@ from credit_risk.features import build_inference_frame  # noqa: E402
 ARTIFACTS = load_artifacts()
 
 
-def predict_credit_worthiness(name: str, *selections: str) -> tuple[str, str, object, object]:
+def predict_credit_worthiness(name: str, *selections: str) -> tuple[str, str, object, object, object]:
     """Predict loan eligibility from UI selections."""
     selection_by_group = {}
     for group, selected_label in zip(FEATURE_GROUPS, selections):
@@ -54,6 +54,7 @@ def predict_credit_worthiness(name: str, *selections: str) -> tuple[str, str, ob
         format_metrics_markdown(ARTIFACTS.metrics),
         ARTIFACTS.feature_importance_plot,
         ARTIFACTS.confusion_matrix_plot,
+        ARTIFACTS.roc_curve_plot,
     )
 
 
@@ -81,11 +82,12 @@ with gr.Blocks(title="Credit Worthiness Risk Classification") as demo:
     metrics_output = gr.Markdown(label="Metrics")
     feature_plot_output = gr.Plot(label="Feature Importance")
     matrix_plot_output = gr.Plot(label="Confusion Matrix")
+    roc_plot_output = gr.Plot(label="ROC Curve")
 
     predict_button.click(
         fn=predict_credit_worthiness,
         inputs=[name_input, *selection_components],
-        outputs=[prediction_output, metrics_output, feature_plot_output, matrix_plot_output],
+        outputs=[prediction_output, metrics_output, feature_plot_output, matrix_plot_output, roc_plot_output],
     )
 
 demo.launch()
