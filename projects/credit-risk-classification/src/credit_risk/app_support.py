@@ -13,8 +13,17 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
 
-from credit_risk.config import MODEL_DIR, REPORTS_DIR, SELECTED_FEATURES
+from credit_risk.config import (
+    DATA_PROCESSED_DIR,
+    DATA_RAW_PATH,
+    MODEL_DIR,
+    REPORTS_DIR,
+    SELECTED_FEATURES,
+)
+from credit_risk.features import build_training_frame
+from credit_risk.modeling import evaluate_model, save_metrics, save_model, train_model
 
 
 @dataclass
@@ -33,15 +42,49 @@ def _load_model() -> Any:
     legacy_pickle_path = MODEL_DIR / "model.pickle"
 
     if joblib_path.exists():
-        return joblib.load(joblib_path)
+        try:
+            return joblib.load(joblib_path)
+        except Exception:
+            pass
 
     if legacy_pickle_path.exists():
-        with legacy_pickle_path.open("rb") as file:
-            return pickle.load(file)
+        try:
+            with legacy_pickle_path.open("rb") as file:
+                return pickle.load(file)
+        except Exception:
+            pass
 
-    raise FileNotFoundError(
-        "No model artifact found. Run `python scripts/train_model.py` first."
+    return _retrain_and_persist_artifacts()
+
+
+def _retrain_and_persist_artifacts() -> Any:
+    """Rebuild model artifacts when serialized files are missing/incompatible."""
+    raw_df = pd.read_csv(DATA_RAW_PATH)
+    features, target = build_training_frame(raw_df)
+
+    x_train, x_test, y_train, y_test = train_test_split(
+        features,
+        target,
+        test_size=0.3,
+        random_state=42,
+        stratify=target,
     )
+
+    model = train_model(x_train=x_train, y_train=y_train, random_state=42)
+    metrics, y_hat = evaluate_model(model=model, x_test=x_test, y_test=y_test)
+
+    DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    x_train.to_parquet(DATA_PROCESSED_DIR / "x_train.parquet", index=False)
+    x_test.to_parquet(DATA_PROCESSED_DIR / "x_test.parquet", index=False)
+    y_train.to_frame(name="target").to_parquet(DATA_PROCESSED_DIR / "y_train.parquet", index=False)
+    y_test.to_frame(name="target").to_parquet(DATA_PROCESSED_DIR / "y_test.parquet", index=False)
+    y_hat.to_frame(name="prediction").to_parquet(DATA_PROCESSED_DIR / "yhat.parquet", index=False)
+
+    save_model(model=model, model_path=MODEL_DIR / "model.joblib")
+    with (MODEL_DIR / "model.pickle").open("wb") as file:
+        pickle.dump(model, file)
+    save_metrics(metrics=metrics, path=REPORTS_DIR / "metrics.json")
+    return model
 
 
 def _load_metrics() -> dict[str, float]:
