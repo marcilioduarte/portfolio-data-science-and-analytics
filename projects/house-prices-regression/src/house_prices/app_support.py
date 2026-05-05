@@ -8,6 +8,8 @@ from typing import Any
 
 import joblib
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 
 from house_prices.config import (
@@ -93,6 +95,44 @@ def format_metrics_markdown(metrics: dict[str, float]) -> str:
     if not metrics:
         return "Metrics not available. Train the model first."
     lines = ["### Model Metrics"]
-    for key, value in metrics.items():
-        lines.append(f"- **{key.upper()}**: {value:.4f}")
+    if "rmse" in metrics:
+        lines.append(
+            f"- **RMSE:** {metrics['rmse']:.4f}  \n"
+            "  Root Mean Squared Error. Penalizes larger prediction errors more strongly. "
+            "Important for risk-sensitive pricing use cases. Lower is better."
+        )
+    if "mae" in metrics:
+        lines.append(
+            f"- **MAE:** {metrics['mae']:.4f}  \n"
+            "  Mean Absolute Error. Average absolute prediction error in target units (USD). "
+            "Important for business interpretability. Lower is better."
+        )
+    if "r2" in metrics:
+        lines.append(
+            f"- **R²:** {metrics['r2']:.4f}  \n"
+            "  Proportion of target variance explained by the model. "
+            "Important for overall explanatory power. Closer to 1.0 is better."
+        )
     return "\n".join(lines)
+
+
+def build_location_map(latitude: float, longitude: float, predicted_value: float) -> go.Figure:
+    """Create a simple geographic visualization of the prediction point."""
+    frame = pd.DataFrame(
+        [
+            {
+                "latitude": latitude,
+                "longitude": longitude,
+                "predicted_value": predicted_value,
+            }
+        ]
+    )
+    fig = px.scatter_geo(
+        frame,
+        lat="latitude",
+        lon="longitude",
+        hover_data={"predicted_value": ":.2f"},
+        title=f"Prediction Location (Estimated Value: ${predicted_value:,.2f})",
+    )
+    fig.update_layout(geo={"scope": "usa"})
+    return fig

@@ -11,6 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from house_prices.app_support import (  # noqa: E402
+    build_location_map,
     format_metrics_markdown,
     load_feature_order,
     load_metrics,
@@ -33,7 +34,7 @@ def run_prediction(
     households: float,
     median_income: float,
     ocean_proximity: str,
-) -> tuple[str, str]:
+) -> tuple[str, str, object]:
     payload = {
         "longitude": longitude,
         "latitude": latitude,
@@ -48,12 +49,24 @@ def run_prediction(
 
     predicted_value = predict_price(model=MODEL, payload=payload, feature_order=FEATURE_ORDER)
     prediction_text = f"Estimated median house value: ${predicted_value:,.2f}"
-    return prediction_text, format_metrics_markdown(METRICS)
+    map_plot = build_location_map(latitude=latitude, longitude=longitude, predicted_value=predicted_value)
+    return prediction_text, format_metrics_markdown(METRICS), map_plot
 
 
 with gr.Blocks(title="California House Prices Regression") as demo:
     gr.Markdown("# California House Prices Regression")
     gr.Markdown("Provide property and location features to estimate median house value.")
+    with gr.Accordion("Variable Guide", open=False):
+        gr.Markdown(
+            "- **Longitude / Latitude:** Geographic coordinates of the district.\n"
+            "- **Housing Median Age:** Median age of houses in the area.\n"
+            "- **Total Rooms:** Total number of rooms in the district.\n"
+            "- **Total Bedrooms:** Total number of bedrooms in the district.\n"
+            "- **Population:** Total population in the district.\n"
+            "- **Households:** Number of households in the district.\n"
+            "- **Median Income:** Median household income in the district.\n"
+            "- **Ocean Proximity:** Categorical location profile relative to the coast."
+        )
 
     with gr.Row():
         longitude = gr.Number(label="Longitude", value=-122.23)
@@ -77,6 +90,7 @@ with gr.Blocks(title="California House Prices Regression") as demo:
     predict_button = gr.Button("Predict Price")
     prediction_output = gr.Textbox(label="Prediction", interactive=False)
     metrics_output = gr.Markdown(label="Metrics")
+    map_output = gr.Plot(label="Location Map")
 
     predict_button.click(
         fn=run_prediction,
@@ -91,7 +105,7 @@ with gr.Blocks(title="California House Prices Regression") as demo:
             median_income,
             ocean_proximity,
         ],
-        outputs=[prediction_output, metrics_output],
+        outputs=[prediction_output, metrics_output, map_output],
     )
 
 demo.launch()
