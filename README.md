@@ -1,7 +1,7 @@
 # Data Science and Analytics Portfolio
 
 Professional portfolio with reproducible machine learning projects for
-classification and regression workflows.
+classification and regression workflows, including Hugging Face Space apps.
 
 ## Repository Structure
 
@@ -28,6 +28,7 @@ Location: `projects/credit-risk-classification`
 - Binary classification for loan eligibility.
 - End-to-end flow: preprocessing, training, evaluation, and Gradio app.
 - Includes feature importance and confusion matrix visual outputs.
+- Deployed as an interactive Hugging Face Space app.
 
 ### 2) House Prices Regression
 
@@ -36,6 +37,7 @@ Location: `projects/house-prices-regression`
 - Regression case study using California housing data.
 - Includes feature engineering, model comparison, and hyperparameter tuning.
 - Produces metrics and trained model artifact for reproducible evaluation.
+- Deployed as an interactive Hugging Face Space app.
 
 ## Quick Start
 
@@ -48,3 +50,8 @@ Location: `projects/house-prices-regression`
 - Linting with `ruff`.
 - Unit tests for critical preprocessing and feature-building logic.
 - GitHub Actions workflow for CI validation on push and pull request.
+
+## Space Deploy
+
+- Reusable script: `scripts/deploy_hf_space.ps1`
+- Purpose: deploy a clean project snapshot from `projects/` to a Hugging Face Space.
