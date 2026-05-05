@@ -164,15 +164,35 @@ def format_metrics_markdown(metrics: dict[str, float]) -> str:
 
     lines = ["### Model Metrics"]
     if "accuracy" in metrics:
-        lines.append(f"- **Accuracy (TP + TN) / (TP + TN + FP + FN):** {metrics['accuracy']:.4f}")
+        lines.append(
+            f"- **Accuracy (TP + TN) / (TP + TN + FP + FN):** {metrics['accuracy']:.4f}  \n"
+            "  Proportion of correct predictions among all predictions. "
+            "The closer to 1.0 (100%), the better."
+        )
     if "precision" in metrics:
-        lines.append(f"- **Precision TP / (TP + FP):** {metrics['precision']:.4f}")
+        lines.append(
+            f"- **Precision TP / (TP + FP):** {metrics['precision']:.4f}  \n"
+            "  Among predicted positives, how many are truly positive. "
+            "The closer to 1.0 (100%), the better."
+        )
     if "recall" in metrics:
-        lines.append(f"- **Recall TP / (TP + FN):** {metrics['recall']:.4f}")
+        lines.append(
+            f"- **Recall TP / (TP + FN):** {metrics['recall']:.4f}  \n"
+            "  Among actual positives, how many the model correctly identifies. "
+            "The closer to 1.0 (100%), the better."
+        )
     if "f1_score" in metrics:
-        lines.append(f"- **F1 Score 2 * (Precision * Recall) / (Precision + Recall):** {metrics['f1_score']:.4f}")
+        lines.append(
+            f"- **F1 Score 2 * (Precision * Recall) / (Precision + Recall):** {metrics['f1_score']:.4f}  \n"
+            "  Harmonic mean of Precision and Recall, useful when you need balance between both. "
+            "The closer to 1.0 (100%), the better."
+        )
     if "roc_auc" in metrics:
-        lines.append(f"- **ROC AUC (Area Under ROC Curve):** {metrics['roc_auc']:.4f}")
+        lines.append(
+            f"- **ROC AUC (Area Under ROC Curve):** {metrics['roc_auc']:.4f}  \n"
+            "  Measures how well the model separates positive and negative classes across thresholds. "
+            "0.5 is random-like performance; the closer to 1.0, the better."
+        )
     return "\n".join(lines)
 
 
